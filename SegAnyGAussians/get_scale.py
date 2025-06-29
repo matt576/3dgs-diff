@@ -115,7 +115,7 @@ if __name__ == '__main__':
     background = torch.zeros(scene_gaussians.get_mask.shape[0], 3, device = 'cuda')
 
     for it, view in tqdm(enumerate(cameras)):
-
+        print(f"Processing view {it}: {view.image_name}") #debugging for mask 299
         rendered_pkg = gaussian_renderer.render_with_depth(view, scene_gaussians, pipeline.extract(args), background)
 
         depth = rendered_pkg['depth']
