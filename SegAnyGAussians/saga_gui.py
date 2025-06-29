@@ -549,9 +549,13 @@ class GaussianSplattingGUI:
         mean = torch.mean(X, dim=0)
         X = X - mean
         covariance_matrix = (1 / n) * torch.matmul(X.T, X).float()  # An old torch bug: matmul float32->float16, 
-        eigenvalues, eigenvectors = torch.eig(covariance_matrix, eigenvectors=True)
-        eigenvalues = torch.norm(eigenvalues, dim=1)
-        idx = torch.argsort(-eigenvalues)
+        # eigenvalues, eigenvectors = torch.linalg.eig(covariance_matrix, eigenvectors=True)
+        eigenvalues, eigenvectors = torch.linalg.eig(covariance_matrix) #new, also changed from eig to eigh, then eig and .real
+        #import pdb; pdb.set_trace()
+        # eigenvalues = torch.norm(eigenvalues, dim=1)
+        # eigenvalues = torch.norm(eigenvalues)  # remove completely
+        idx = torch.argsort(-eigenvalues.real) # extract real part for sorting
+        # import pdb; pdb.set_trace()
         eigenvectors = eigenvectors[:, idx]
         proj_mat = eigenvectors[:, 0:n_components]
         
