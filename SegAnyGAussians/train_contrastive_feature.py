@@ -297,7 +297,8 @@ def training(dataset, opt, pipe, iteration, saving_iterations, checkpoint_iterat
         with torch.no_grad():
             cosine_pos = corr[gt_corrs == 1].mean()
             cosine_neg = corr[gt_corrs == 0].mean()
-
+        
+        torch.cuda.empty_cache()#new
         loss.backward()
 
         feature_gaussians.optimizer.step()
