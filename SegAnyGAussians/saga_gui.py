@@ -35,7 +35,8 @@ def depth2img(depth):
     return depth_img
 
 class CONFIG:
-    r = 2   # scale ratio
+    # r = 2   # scale ratio 
+    r = 1.5
     window_width = int(2160/r)
     window_height = int(1200/r)
 
@@ -558,7 +559,7 @@ class GaussianSplattingGUI:
         # import pdb; pdb.set_trace()
         eigenvectors = eigenvectors[:, idx]
         proj_mat = eigenvectors[:, 0:n_components]
-        
+        proj_mat = proj_mat.to(dtype=torch.float32)
         return proj_mat
     
 
