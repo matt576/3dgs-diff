@@ -145,7 +145,7 @@ def storePly(path, xyz, rgb):
     vertex_element = PlyElement.describe(elements, 'vertex')
     ply_data = PlyData([vertex_element])
     ply_data.write(path)
-
+#### important function for the train/test split:
 def readColmapSceneInfo(path, images, eval, llffhold=8, need_features=False, need_masks=False, sample_rate = 1.0, allow_principle_point_shift = False, replica=False):
     try:
         cameras_extrinsic_file = os.path.join(path, "sparse/0", "images.bin")
@@ -170,12 +170,43 @@ def readColmapSceneInfo(path, images, eval, llffhold=8, need_features=False, nee
     else:
         cam_infos = sorted(cam_infos_unsorted.copy(), key = lambda x : int(x.image_name.split("_")[-1]))
 
+    # if eval:
+    #     train_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold != 0]
+    #     test_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold == 0]
+    # else:
+    #     train_cam_infos = cam_infos
+    #     test_cam_infos = []
+    # original bit above, modified below:
+
+    # Define paths for consistent split files
+    split_dir = Path(path)
+    train_split_file = split_dir / "train_image_names.txt"
+    test_split_file = split_dir / "test_image_names.txt"
+
     if eval:
+        # On first run with --eval, create and save split
         train_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold != 0]
         test_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold == 0]
+
+        # Save split
+        with open(train_split_file, 'w') as f:
+            f.writelines([f"{c.image_name}\n" for c in train_cam_infos])
+        with open(test_split_file, 'w') as f:
+            f.writelines([f"{c.image_name}\n" for c in test_cam_infos])
+    elif train_split_file.exists() and test_split_file.exists():
+        # Load existing split during contrastive training
+        with open(train_split_file, 'r') as f:
+            train_names = set([line.strip() for line in f.readlines()])
+        with open(test_split_file, 'r') as f:
+            test_names = set([line.strip() for line in f.readlines()])
+
+        train_cam_infos = [c for c in cam_infos if c.image_name in train_names]
+        test_cam_infos = [c for c in cam_infos if c.image_name in test_names]
     else:
+        # Fallback to using all as train (e.g., no eval ever used)
         train_cam_infos = cam_infos
         test_cam_infos = []
+
 
     nerf_normalization = getNerfppNorm(train_cam_infos)
 
