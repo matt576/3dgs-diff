@@ -184,9 +184,20 @@ def readColmapSceneInfo(path, images, eval, llffhold=8, need_features=False, nee
     test_split_file = split_dir / "test_image_names.txt"
 
     if eval:
-        # On first run with --eval, create and save split
-        train_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold != 0]
-        test_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold == 0]
+
+        split_mode = "every8_train"  # options: "every8_train", "every8_test", "one_side"
+        
+        if split_mode == "every8_train":
+            print(split_mode)
+            # Every 8th image goes to TRAINING set
+            train_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold == 0]
+            test_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold != 0]
+
+        else: # default is every 8th = test
+            print("default")
+            # On first run with --eval, create and save split
+            train_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold != 0]
+            test_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold == 0]
 
         # Save split
         with open(train_split_file, 'w') as f:
