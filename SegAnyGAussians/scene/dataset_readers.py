@@ -185,7 +185,7 @@ def readColmapSceneInfo(path, images, eval, llffhold=8, need_features=False, nee
 
     if eval:
 
-        split_mode = "every8_train"  # options: "every8_train", "every8_test", "one_side"
+        split_mode = "one_side"  # options: "every8_train", "every8_test", "one_side"
         
         if split_mode == "every8_train":
             print(split_mode)
@@ -193,6 +193,15 @@ def readColmapSceneInfo(path, images, eval, llffhold=8, need_features=False, nee
             train_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold == 0]
             test_cam_infos = [c for idx, c in enumerate(cam_infos) if idx % llffhold != 0]
 
+        elif split_mode == "one_side":
+            print(split_mode)
+            # Sort cameras by image name (frame_00001.jpg, frame_00002.jpg, ...)
+            cam_infos_sorted = sorted(cam_infos, key=lambda c: c.image_name)
+            # First 8 images = train
+            train_cam_infos = cam_infos_sorted[:8]
+            # Rest = test
+            test_cam_infos = cam_infos_sorted[8:]
+        
         else: # default is every 8th = test
             print("default")
             # On first run with --eval, create and save split
