@@ -6,5 +6,3 @@ This work builds on the SAGA (Segment Any 3D Gaussians) GitHub repository, origi
 After 3DGS pretraining with your dataset, the code with the implemented pipeline, functions, and further instructions can be found at **SegAnyGAussians/3dgs-diff.ipynb**.
 
 NEW: Artifact removal approach (DBSCAN, density-based) to clean gaussian renderings from floating artifacts and noise.
-
-More to come here regarding environment set up and functionalities.
